@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="shortcut icon" href="/image-editing.png" type="image/x-icon" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ENHANCE</title>
+    <link rel="stylesheet" href="/enhance.css" />
+  </head>
+  <body>
+    <h1>MY_HOME</h1>
+    <span class="loader" id="loder"></span>
+
+    <div class="container">
+      <form id="uploadForm" enctype="multipart/form-data">
+        <img
+          id="preview_img"
+          src=""
+          alt=""
+          style="position: relative; z-index: 10"
+        />
+
+        <img
+          id="filtered_image"
+          src=""
+          alt=""
+          style="position: relative; z-index: 20; display: none"
+          crossorigin="anonymous"
+        />
+
+        <input
+          type="file"
+          id="imageInput"
+          onchange="preview_image()"
+          name="image"
+          accept="image/*"
+          required
+        />
+
+        <br />
+        <a href="" id="download" style="display: none"></a>
+        <button onclick="enhance_image(event)">
+          <i class="fas fa-upload"></i> Enhance Image
+        </button>
+        <input type="hidden" name="bucket" value=" ai-direct-upload" />
+        <input type="hidden" name="content_type" value="image/jpeg" />
+      </form>
+      <div id="result" style="margin-top: 20px"></div>
+    </div>
+
+    <script>
+      let currentImage = null; // Store the latest version of the image
+      //  preview image
+      function preview_image() {
+        let files = document.getElementById("imageInput").files;
+        let imageTag = document.getElementById("preview_img");
+
+        if (files.length === 0) {
+          alert("Please select an image.");
+          return;
+        }
+
+        const reader = new FileReader();
+
+        reader.onload = (e) => {
+          currentImage = new Image();
+          currentImage.src = e.target.result;
+
+          currentImage.onload = () => {
+            imageTag.src = currentImage.src;
+            imageTag.style.display = "block";
+          };
+        };
+
+        reader.readAsDataURL(files[0]);
+      }
+
+      async function enhance_image(event) {
+        event.preventDefault();
+
+        let loader = document.getElementById("loder");
+        loader.style.display = "block";
+
+        let form = document.getElementById("uploadForm");
+        let image_tag = document.getElementById("filtered_image");
+        let preview_imagetag = document.getElementById("preview_img");
+
+        let files = document.getElementById("imageInput").files;
+        let link = document.getElementById("download");
+
+        let file = files[0];
+
+        if (files.length === 0) {
+          alert("Please select an image.");
+          return;
+        }
+
+        let formdata = new FormData();
+        formdata.append("image", file);
+
+        let response = await fetch("/image_enhance", {
+          method: "POST",
+          body: formdata,
+        });
+        console.log(response);
+        if (!response.ok) {
+          alert("error occcured");
+          return;
+        }
+
+        loader.style.display = "block";
+
+        data = await response.json();
+
+        if (data.success === true) {
+          let loader = document.getElementById("loder");
+          loader.style.display = "none";
+          preview_imagetag.style.display = "none";
+          console.log(image_tag.style);
+          image_tag.src = data.updated_img;
+          image_tag.style.display = "block";
+          console.log("download");
+          downloadimage(data.updated_img);
+        } else if (data.error === false) {
+          alert(data.error);
+        }
+      }
+
+      async function downloadimage(imageUrl) {
+        try {
+          // Fetch the image as a blob
+          const response = await fetch(imageUrl);
+          const blob = await response.blob();
+          const url = URL.createObjectURL(blob);
+
+          // Create an <a> element and trigger download
+          let link = document.getElementById("download");
+          link.style.display = "inline-block";
+          link.href = url;
+
+          link.download = `processed_img${Date.now()}`; // Name of the file to be downloaded
+          document.body.appendChild(link);
+          link.click(); // Simulate click to download
+          document.body.removeChild(link); // Clean up
+
+          // Release the object URL to free up memory
+        } catch (error) {
+          console.log(error.message);
+        }
+      }
+    </script>
+  </body>
+</html>

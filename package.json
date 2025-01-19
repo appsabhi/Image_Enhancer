@@ -1,0 +1,21 @@
+{
+  "name": "image_enhancer",
+  "version": "1.0.0",
+  "description": "for enhancing image",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon app.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^16.4.7",
+    "ejs": "^3.1.10",
+    "axios": "^1.7.9",
+    "express": "^4.21.2",
+    "multer": "^1.4.5-lts.1",
+    "nodemon": "^3.1.9",
+    "xmldom": "^0.6.0"
+  }
+}
