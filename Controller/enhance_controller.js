@@ -37,7 +37,7 @@ module.exports={
     },
     upload_and_enhance_image: async (req, res) => {
         try {
-   console.log("enter")
+
           CSRFtoken = generatecsrftoken();
     
           //   first Request //
@@ -52,9 +52,9 @@ module.exports={
 
     
           formdata.append("CSRFtoken", CSRFtoken);
-          console.log("first_request")
+      
 
-    console.log("hello",formdata)
+
           let first_response = await fetch(
             "https://www.befunky.com/api/direct-upload/",
             {
@@ -62,18 +62,18 @@ module.exports={
               body: formdata,
             }
           );
-      console.log(first_response)
+
 
           let data = await first_response.json();
-      console.log(data)
+
 
     
           //   first Request //
-          console.log("first_request")
+      
     
           if (data.data && data.data.inputs) {
             let inputs = data.data.inputs;
-            console.log("helloworld2")
+        
     
             // second request //
     
